@@ -11,8 +11,7 @@ services:
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
-    networks:
-      - lesson
+      - ./init.sql:/docker-entrypoint-initdb.d
   pgadmin4:
     image: dpage/pgadmin4:8.4
     ports:
@@ -30,5 +29,3 @@ services:
 volumes:
   db-data:
   pgadmin-data:
-networks:
-  lesson:
