@@ -45,7 +45,9 @@ func (tr *taskRepository) GetByID(task *model.Task, userId uint, taskId uint) er
 }
 
 func (tr *taskRepository) Update(task *model.Task, userId uint, taskId uint) error {
-	result := tr.db.Model(task).Clauses(clause.Returning{}).Where("user_id = ? AND id = ?", userId, taskId).Update("title", task.Title)
+	result := tr.db.Model(task).Clauses(clause.Returning{}).Where("user_id = ? AND id = ?", userId, taskId).Updates(map[string]interface{}{
+		"title": task.Title,
+	})
 	if result.Error != nil {
 		return result.Error
 	}
