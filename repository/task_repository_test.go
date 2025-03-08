@@ -1,12 +1,15 @@
 package repository
 
 import (
+	"fmt"
 	"go-rest-api/model"
 	"go-rest-api/util"
 	"testing"
 
 	"gorm.io/gorm"
 )
+
+var USER_ID = 999
 
 func setupTaskTestDB() *gorm.DB {
 	db := util.NewTestDB()
@@ -15,13 +18,14 @@ func setupTaskTestDB() *gorm.DB {
 
 func TestCreateTask(t *testing.T) {
 	db := setupTaskTestDB()
-	db.Exec("INSERT INTO users (id, email, password) VALUES (1, 'user1@testtask.com', 'password') ON CONFLICT (id) DO NOTHING")
+	query := fmt.Sprintf("INSERT INTO users (id, email, password) VALUES (%d, 'user1@testtask.com', 'password') ON CONFLICT (id) DO NOTHING", USER_ID)
+	db.Exec(query)
 	defer util.CloseTestDB(db)
 	defer util.CleanupTaskTable(db)
 
 	tr := NewTaskRepository(db)
 
-	task := model.Task{Title: "Test Task", UserId: 1}
+	task := model.Task{Title: "Test Task", UserId: uint(USER_ID)}
 
 	if err := tr.Create(&task); err != nil {
 		t.Fatalf("Create task failed: %v", err)
@@ -45,11 +49,11 @@ func TestUpdateTask(t *testing.T) {
 
 	tr := NewTaskRepository(db)
 
-	task := model.Task{Title: "Test Task", UserId: 1}
+	task := model.Task{Title: "Test Task", UserId: uint(USER_ID)}
 	db.Create(&task)
 
-	updatedTask := model.Task{Title: "Updated Title", UserId: 1}
-	if err := tr.Update(&updatedTask, 1, task.ID); err != nil {
+	updatedTask := model.Task{Title: "Updated Title", UserId: uint(USER_ID)}
+	if err := tr.Update(&updatedTask, uint(USER_ID), task.ID); err != nil {
 		t.Fatalf("Update task failed: %v", err)
 	}
 
@@ -68,11 +72,11 @@ func TestGetAllTasks(t *testing.T) {
 
 	tr := NewTaskRepository(db)
 
-	db.Create(&model.Task{Title: "Test Title1", UserId: 1})
-	db.Create(&model.Task{Title: "Test Title2", UserId: 1})
+	db.Create(&model.Task{Title: "Test Title1", UserId: uint(USER_ID)})
+	db.Create(&model.Task{Title: "Test Title2", UserId: uint(USER_ID)})
 
 	var tasks []model.Task
-	if err := tr.GetAll(&tasks, 1); err != nil {
+	if err := tr.GetAll(&tasks, uint(USER_ID)); err != nil {
 		t.Fatalf("GetAll task failed: %v", err)
 	}
 	if len(tasks) != 2 {
@@ -87,11 +91,11 @@ func TestGetTaskById(t *testing.T) {
 
 	tr := NewTaskRepository(db)
 
-	expected := model.Task{ID: 1, Title: "Test Title1", UserId: 1}
+	expected := model.Task{ID: 1, Title: "Test Title1", UserId: uint(USER_ID)}
 	db.Create(&expected)
 
 	var actual model.Task
-	if err := tr.GetByID(&actual, 1, expected.ID); err != nil {
+	if err := tr.GetByID(&actual, uint(USER_ID), expected.ID); err != nil {
 		t.Fatalf("GetById task failed: %v", err)
 	}
 	if actual.ID != expected.ID {
