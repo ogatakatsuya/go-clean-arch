@@ -21,7 +21,7 @@ func (tv *taskValidator) TaskValidate(task model.Task) error {
 		validation.Field(
 			&task.Title,
 			validation.Required.Error("title is requred"),
-			validation.RuneLength(1, 10).Error("limited max 10 char"),
+			validation.RuneLength(1, 100).Error("limited max 100 char"),
 		),
 	)
 }
