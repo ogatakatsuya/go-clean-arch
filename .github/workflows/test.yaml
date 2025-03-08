@@ -8,6 +8,21 @@ on:
 jobs:
   test:
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testuser -d testdb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: 対象ブランチをクローン
         uses: actions/checkout@v4
@@ -22,3 +37,4 @@ jobs:
       - name: テストを実行
         run: |
           go test ./usecase
+          go test ./repository
