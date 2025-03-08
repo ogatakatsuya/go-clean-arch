@@ -19,7 +19,7 @@ func PrepareTestDB() {
 }
 
 func NewTestDB() *gorm.DB {
-	url := "postgres://user:password@localhost:5434/test_db"
+	url := "postgres://test_user:test_password@localhost:5434/test_db"
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
