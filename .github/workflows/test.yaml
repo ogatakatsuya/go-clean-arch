@@ -40,4 +40,4 @@ jobs:
           GO_ENV=test go run migrate.go
           cd ..
           go test ./usecase
-          go test ./repository
+          go test ./repository -p 1
