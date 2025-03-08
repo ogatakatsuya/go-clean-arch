@@ -42,6 +42,14 @@ func CleanupTestDB(db *gorm.DB) {
 	}
 }
 
+func CleanupTaskTable(db *gorm.DB) {
+	db.Exec("TRUNCATE TABLE tasks CASCADE")
+}
+
+func CleanupUserTabls(db *gorm.DB) {
+	db.Exec("TRUNCASE TABLE users CASCADE")
+}
+
 func NewJWTToken() (*jwt.Token, string) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userId": 1.0,
