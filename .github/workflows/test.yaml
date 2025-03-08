@@ -12,8 +12,8 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
           POSTGRES_DB: test_db
         ports:
           - 5432:5432
@@ -36,5 +36,8 @@ jobs:
 
       - name: テストを実行
         run: |
+          cd migrate
+          GO_ENV=test go run migrate.go
+          cd ..
           go test ./usecase
           go test ./repository

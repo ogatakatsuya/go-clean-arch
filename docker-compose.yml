@@ -3,7 +3,7 @@ services:
   db:
     image: postgres:15.1-alpine
     ports:
-      - 5434:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -11,7 +11,6 @@ services:
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d
   pgadmin4:
     image: dpage/pgadmin4:8.4
     ports:
