@@ -25,7 +25,7 @@ func NewTaskUseCase(tr repository.ITaskRepository, tv validator.ITaskValidator) 
 
 func (tu *taskUsecase) GetAllTasks(userId uint) ([]model.TaskResponse, error) {
 	var tasks []model.Task
-	if err := tu.tr.GetAllTasks(&tasks, userId); err != nil {
+	if err := tu.tr.GetAll(&tasks, userId); err != nil {
 		return nil, err
 	}
 
@@ -43,7 +43,7 @@ func (tu *taskUsecase) GetAllTasks(userId uint) ([]model.TaskResponse, error) {
 
 func (tu *taskUsecase) GetTaskByID(userId uint, taskId uint) (model.TaskResponse, error) {
 	task := model.Task{}
-	if err := tu.tr.GetTaskByID(&task, userId, taskId); err != nil {
+	if err := tu.tr.GetByID(&task, userId, taskId); err != nil {
 		return model.TaskResponse{}, err
 	}
 	return model.TaskResponse{
@@ -58,7 +58,7 @@ func (tu *taskUsecase) CreateTask(task model.Task) (model.TaskResponse, error) {
 	if err := tu.tv.TaskValidate(task); err != nil {
 		return model.TaskResponse{}, err
 	}
-	if err := tu.tr.CreateTask(&task); err != nil {
+	if err := tu.tr.Create(&task); err != nil {
 		return model.TaskResponse{}, err
 	}
 	return model.TaskResponse{
@@ -73,7 +73,7 @@ func (tu *taskUsecase) UpdateTask(userId uint, taskId uint, task model.Task) (mo
 	if err := tu.tv.TaskValidate(task); err != nil {
 		return model.TaskResponse{}, err
 	}
-	if err := tu.tr.UpdateTask(&task, userId, taskId); err != nil {
+	if err := tu.tr.Update(&task, userId, taskId); err != nil {
 		return model.TaskResponse{}, err
 	}
 	return model.TaskResponse{
@@ -85,5 +85,5 @@ func (tu *taskUsecase) UpdateTask(userId uint, taskId uint, task model.Task) (mo
 }
 
 func (tu *taskUsecase) DeleteTask(userId uint, taskId uint) error {
-	return tu.tr.DeleteTask(userId, taskId)
+	return tu.tr.Delete(userId, taskId)
 }
