@@ -3,34 +3,23 @@ package repository
 import (
 	"go-rest-api/model"
 	"go-rest-api/util"
-	"os"
 	"testing"
 
 	"gorm.io/gorm"
 )
 
-var (
-	tr ITaskRepository
-	db *gorm.DB
-)
-
-// テストのセットアップ
-func TestMain(m *testing.M) {
-	db = util.NewTestDB()
-	tr = NewTaskRepository(db)
-
-	util.PrepareTestDB()
-	db.Exec("INSERT INTO users (id, email, password) VALUES (1, 'user1@text.com', 'password') ON CONFLICT (id) DO NOTHING")
-
-	code := m.Run()
-
-	util.CloseTestDB(db)
-
-	os.Exit(code)
+func setupTaskTestDB() *gorm.DB {
+	db := util.NewTestDB()
+	return db
 }
 
 func TestCreateTask(t *testing.T) {
+	db := setupTaskTestDB()
+	db.Exec("INSERT INTO users (id, email, password) VALUES (1, 'user1@testtask.com', 'password') ON CONFLICT (id) DO NOTHING")
+	defer util.CloseTestDB(db)
 	defer util.CleanupTaskTable(db)
+
+	tr := NewTaskRepository(db)
 
 	task := model.Task{Title: "Test Task", UserId: 1}
 
@@ -50,7 +39,11 @@ func TestCreateTask(t *testing.T) {
 }
 
 func TestUpdateTask(t *testing.T) {
+	db := setupTaskTestDB()
+	defer util.CloseTestDB(db)
 	defer util.CleanupTaskTable(db)
+
+	tr := NewTaskRepository(db)
 
 	task := model.Task{Title: "Test Task", UserId: 1}
 	db.Create(&task)
@@ -69,7 +62,11 @@ func TestUpdateTask(t *testing.T) {
 }
 
 func TestGetAllTasks(t *testing.T) {
+	db := setupTaskTestDB()
+	defer util.CloseTestDB(db)
 	defer util.CleanupTaskTable(db)
+
+	tr := NewTaskRepository(db)
 
 	db.Create(&model.Task{Title: "Test Title1", UserId: 1})
 	db.Create(&model.Task{Title: "Test Title2", UserId: 1})
@@ -84,18 +81,23 @@ func TestGetAllTasks(t *testing.T) {
 }
 
 func TestGetTaskById(t *testing.T) {
+	db := setupTaskTestDB()
+	defer util.CloseTestDB(db)
 	defer util.CleanupTaskTable(db)
 
-	db.Create(&model.Task{ID: 1, Title: "Test Title1", UserId: 1})
+	tr := NewTaskRepository(db)
 
-	var task model.Task
-	if err := tr.GetByID(&task, 1, 1); err != nil {
+	expected := model.Task{ID: 1, Title: "Test Title1", UserId: 1}
+	db.Create(&expected)
+
+	var actual model.Task
+	if err := tr.GetByID(&actual, 1, expected.ID); err != nil {
 		t.Fatalf("GetById task failed: %v", err)
 	}
-	if task.ID != 1 {
-		t.Fatalf("Expected id 1 got %d", task.ID)
+	if actual.ID != expected.ID {
+		t.Fatalf("Expected id %d got %d", expected.ID, actual.ID)
 	}
-	if task.Title != "Test Title1" {
-		t.Fatalf("Expected title Test Title1 got %s", task.Title)
+	if actual.Title != expected.Title {
+		t.Fatalf("Expected title %s got %s", expected.Title, actual.Title)
 	}
 }

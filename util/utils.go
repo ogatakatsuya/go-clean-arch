@@ -13,7 +13,7 @@ import (
 
 func PrepareTestDB() {
 	conn := NewTestDB()
-	defer fmt.Println("Test database migratoin succeded.")
+	defer fmt.Println("Test database migration succeded.")
 	defer CloseTestDB(conn)
 	conn.AutoMigrate(&model.User{}, &model.Task{})
 }
@@ -47,7 +47,7 @@ func CleanupTaskTable(db *gorm.DB) {
 }
 
 func CleanupUserTabls(db *gorm.DB) {
-	db.Exec("TRUNCASE TABLE users CASCADE")
+	db.Exec("TRUNCATE TABLE users CASCADE")
 }
 
 func NewJWTToken() (*jwt.Token, string) {
